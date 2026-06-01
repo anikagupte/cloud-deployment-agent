@@ -11,7 +11,7 @@ def collect_inputs():
             budget = float(budget)
             if budget > 0:
                 valid = True
-        except TypeError:
+        except ValueError:
             pass
 
 
@@ -22,7 +22,7 @@ def collect_inputs():
             storage = int(storage)
             if storage > 0:
                 valid = True
-        except TypeError:
+        except ValueError:
             pass
 
     valid = False
@@ -42,7 +42,7 @@ def collect_inputs():
                 security = int(security)
                 if security >= 0 and security <= 10:
                     valid = True
-            except TypeError:
+            except ValueError:
                 pass
 
     valid = False
@@ -51,14 +51,10 @@ def collect_inputs():
         try:
             sustainability = float(sustainability)
             if sustainability >= 0 and sustainability <= 100:
+                sustainability = sustainability / 100 # convert to percentage multiplier
                 valid = True
-        except TypeError:
+        except ValueError:
             pass
-    sustainability = sustainability / 100 # convert to percentage multiplier
-
-    valid = False
-    while not valid:
-        top_priority = input('please enter your top priority (none / basic / moderate / high / expert): ').lower()
 
     valid = False
     while not valid:
@@ -74,5 +70,11 @@ def collect_inputs():
             except TypeError:
                 pass
 
-    return {budget: budget, storage: storage, expertise: expertise, security: security, sustainability: sustainability, top_priority: top_priority, growth: growth}
+    valid = False
+    while not valid:
+        top_priority = input('please enter your top priority (cost / security / sustainability / scalability): ').lower()
+        if top_priority == 'cost' or top_priority == 'security' or top_priority == 'sustainability' or top_priority == 'scalability':
+            valid = True
+
+    return {"budget": budget, "storage": storage, "expertise": expertise, "security": security, "sustainability": sustainability, "top_priority": top_priority, "growth": growth}
 
