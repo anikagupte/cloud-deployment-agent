@@ -134,10 +134,10 @@ def calculate_scores(inputs):
 
 def load_scores(path):
     """
-    load the data from excel
+    load the data from excel spreadsheet (decision matrix)
     check actual docstring formatting
     """
-    file = openpxyl.load_workbook(path)
+    file = openpyxl.load_workbook(path)
     scores = {}
 
     for sheet_name in ["Provider_Scores", "Deployment_Scores", "Service_Scores"]:
@@ -163,10 +163,17 @@ def load_scores(path):
 
 def score_sheet(data, weights):
     """
-    get scores from excel spreadsheet (decision matrix)
+    multiply scores by their calculated weights
     check actual docstring formatting
     """
 
     results = {}
 
+    for header in data["headers"]:
+        results[header] = 0
 
+    for criterion_index, criterion in enumerate(data["criteria"]):
+        for option_index, option in enumerate(data["headers"]):
+            results[option] += data["values"][criterion_index][option_index] * weights[criterion]
+
+    return results
