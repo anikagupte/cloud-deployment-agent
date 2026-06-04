@@ -1,3 +1,5 @@
+import openpyxl
+
 def collect_inputs():
     """
     collect and validate inputs
@@ -79,6 +81,7 @@ def collect_inputs():
 
     return {"budget": budget, "storage": storage, "expertise": expertise, "security": security, "sustainability": sustainability, "top_priority": top_priority, "growth": growth}
 
+
 def calculate_scores(inputs):
     """
     calculate scores using weightings
@@ -125,4 +128,45 @@ def calculate_scores(inputs):
             complexity_score *= 1.25
         else:
             customisability_score *= 2
+
+    return {"Cost": cost_score, "Scalability": scalability_score, "Sustainability": sustainability_score, "Geographic Coverage": geographic_coverage, "Security": security_score, "Technical Complexity": complexity_score, "Customisability": customisability_score, "Management Overhead": management_overhead}
+
+
+def load_scores(path):
+    """
+    load the data from excel
+    check actual docstring formatting
+    """
+    file = openpxyl.load_workbook(path)
+    scores = {}
+
+    for sheet_name in ["Provider_Scores", "Deployment_Scores", "Service_Scores"]:
+            sheet = file[sheet_name]
+            
+            rows = [row for row in sheet.iter_rows(values_only=True) if any(cell is not None for cell in row)]
+            
+            first_row = rows[0]
+            data_rows = rows[1:]
+            
+            headers = first_row[1:]
+            criteria = [row[0] for row in data_rows]
+            values = [row[1:] for row in data_rows]
+            
+            scores[sheet_name] = {
+                "headers": headers,
+                "criteria": criteria,
+                "values": values
+            }
+        
+    return scores
+    
+
+def score_sheet(data, weights):
+    """
+    get scores from excel spreadsheet (decision matrix)
+    check actual docstring formatting
+    """
+
+    results = {}
+
 
