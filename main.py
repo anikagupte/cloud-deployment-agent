@@ -177,3 +177,12 @@ def score_sheet(data, weights):
             results[option] += data["values"][criterion_index][option_index] * weights[criterion]
 
     return results
+
+
+def get_winner(results):
+    """
+    return provider with the highest score
+    check actual docsring formatting
+    """
+    return max(results, key=results.get)
+
