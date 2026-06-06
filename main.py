@@ -5,7 +5,7 @@ and returns the best deployment solution for their business.
 
 import openpyxl
 import google.generativeai as genai
-genai.configure(api_key="")
+genai.configure(api_key="API_KEY")
 
 def collect_inputs():
     """
