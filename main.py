@@ -229,3 +229,25 @@ def get_recommendation(winners, inputs):
 
     gemini_call = genai.GenerativeModel("gemini-2.0-flash").generate_content(prompt)
     return gemini_call.text
+
+
+def main():
+    """
+    calls all functions
+    """
+    scores = load_scores("decision_matrix.xlsx")
+    inputs = collect_inputs()
+    weights = calculate_scores(inputs)
+    weighted_scores = []
+    weighted_scores.append(score_sheet(scores['Provider_Scores'], weights))
+    weighted_scores.append(score_sheet(scores['Deployment_Scores'], weights))
+    weighted_scores.append(score_sheet(scores['Service_Scores'], weights))
+    winners = {'Provider': None, 'Deployment': None, 'Service': None}
+    winners['Provider'] = get_winner(weighted_scores[0])
+    winners['Deployment'] = get_winner(weighted_scores[1])
+    winners['Service'] = get_winner(weighted_scores[2])
+    print(get_recommendation(winners, inputs))
+
+
+if __name__ == "__main__":
+    main()
