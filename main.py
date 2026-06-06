@@ -1,9 +1,15 @@
+"""
+This is an AI agent that takes in a user's cloud computing requirements
+and returns the best deployment solution for their business.
+"""
+
 import openpyxl
+import google.generativeai as genai
+genai.configure(api_key="")
 
 def collect_inputs():
     """
     collect and validate inputs
-    check actual docstring formatting
     """
 
     valid = False
@@ -85,8 +91,9 @@ def collect_inputs():
 def calculate_scores(inputs):
     """
     calculate scores using weightings
-    check actual docstring formatting
+    :param inputs: dictionary of strings
     """
+
     cost_score = 1.0
     scalability_score = 1.0
     sustainability_score = 1.0
@@ -135,8 +142,9 @@ def calculate_scores(inputs):
 def load_scores(path):
     """
     load the data from excel spreadsheet (decision matrix)
-    check actual docstring formatting
+    :param path: string
     """
+
     file = openpyxl.load_workbook(path)
     scores = {}
 
@@ -164,7 +172,8 @@ def load_scores(path):
 def score_sheet(data, weights):
     """
     multiply scores by their calculated weights
-    check actual docstring formatting
+    :param data: dictionary of integers
+    :param weights: dictionary fo floats
     """
 
     results = {}
@@ -182,7 +191,41 @@ def score_sheet(data, weights):
 def get_winner(results):
     """
     return provider with the highest score
-    check actual docsring formatting
+    :param results: dictionary of floats
     """
+
     return max(results, key=results.get)
 
+
+def get_recommendation(winners, inputs):
+    """
+    create prompt and call Gemini API
+    :param winners: dictionary of strings
+    :param inputs: dictionary of strings
+    """
+
+    prompt = "You are an experienced, specialised cloud deployment advisor for startups."
+    prompt += f" Give them a detailed explanation of why the chosen stategy is best suited for them and produce a step by step plan for deployment."
+    prompt += f" The plan should be extremely detailed, and also include further tips for management of the cloud infrastructure."
+    prompt += f" Reference their specific inputs including priorities and constraints."
+    prompt += f" Specifically reference sustainability from water and energy usage - the aim should be to save these resources."
+    prompt += f" Consider techniques such as virtualisation and simply switching off power at night."
+    prompt += f" Give advice on how to consistently maintain a reduction in energy/water usage."
+
+    prompt += f" Monthly budget: {inputs['budget']} USD."
+    prompt += f" Storage requirements: {inputs['storage']} TB."
+    prompt += f" Technical expertise: {inputs['expertise']}."
+    if inputs['security'] is not None:
+        prompt += f" Security requirements (between 0 and 1): {inputs['security']}."
+    prompt += f" Sustainability requirements (between 0 and 1): {inputs['sustainability']}."
+    if inputs['growth'] is not None:
+        prompt += f" Growth multiplier expectation for the next five years: {inputs['growth']}."
+    prompt += f" Their top priority is {inputs['top_priority']}."
+    
+    prompt += f" Scores and weights have been calculated and the winners as follows. Use this to structure the advice."
+    prompt += f" Provider: {winners['Provider']}."
+    prompt += f" Provider: {winners['Deployment']}."
+    prompt += f" Provider: {winners['Service']}."
+
+    gemini_call = genai.GenerativeModel("gemini-2.0-flash").generate_content(prompt)
+    return gemini_call.text
