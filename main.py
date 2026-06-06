@@ -4,8 +4,8 @@ and returns the best deployment solution for their business.
 """
 
 import openpyxl
-import google.generativeai as genai
-genai.configure(api_key="API_KEY")
+from google import genai
+from google.genai import types
 
 def collect_inputs():
     """
@@ -21,7 +21,6 @@ def collect_inputs():
                 valid = True
         except ValueError:
             pass
-
 
     valid = False
     while not valid:
@@ -227,7 +226,8 @@ def get_recommendation(winners, inputs):
     prompt += f" Provider: {winners['Deployment']}."
     prompt += f" Provider: {winners['Service']}."
 
-    gemini_call = genai.GenerativeModel("gemini-2.0-flash").generate_content(prompt)
+    client = genai.Client(vertexai=True, project="cloud-deployment-agent", location="us-central1")
+    gemini_call = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
     return gemini_call.text
 
 
